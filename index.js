@@ -604,14 +604,14 @@ const getSupportAddresses = async function(next_page = false, items = []) {
 
 const exportAll = async () => {
 
-	/*
+
 	console.log('Exporting tickets...');
 	await getTickets();
-*/
+
 	console.log('Exporting tickets\' comments...');
 	await getAllTicketComments();
 
-	/*
+
 	console.log('Exporting users...');
 	await getUsers();
 
@@ -635,7 +635,7 @@ const exportAll = async () => {
 
 	console.log('Exporting support addresses...');
 	await getSupportAddresses();
-	*/
+
 
 	console.log('Finished');
 }
