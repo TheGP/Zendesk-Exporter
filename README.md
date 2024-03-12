@@ -2,9 +2,7 @@
 
 This project is a tool for exporting data from Zendesk, including tickets, comments, users, views, triggers, macros, automations, settings, and support addresses.
 
-## About the Project
-
-The Zendesk Exporter allows users to export various data from their Zendesk instance for backup, analysis, or migration purposes. It provides functions to retrieve tickets, comments, users, views, triggers, macros, automations, settings, and support addresses, and export them into JSON files.
+You can use it for backup, migration, or analysis. Data is exported to JSON files, but most of the files you have to read line by line to extract JSON data.
 
 ## Getting Started
 
@@ -49,6 +47,9 @@ To export data from Zendesk, follow these steps:
    ```
 
 This will start the export process, fetching data from Zendesk API and saving it into JSON files in the `exported` directory.
+
+To modify export look for `exportAll` function, you may disable / enable items you need to export.
+
 
 ## Contributing
 
