@@ -119,9 +119,7 @@ const getTicketComments = async function(id, next_page = false, comments = [], e
 		}).catch(function (error) {
 			if (10 < errors_count) {
 				console.log('skipping because of too many errors', id)
-				fs.writeFileSync(exportFolder + 'errors.txt', `Skipping getTicketComments because of too many errors: ${JSON.stringify([id, next_page, comments, errors_count])} \n`, { flag: "a+" }, (err) => {
-					if (err) throw err;
-				});
+				logError(`Skipping getTicketComments because of too many errors: ${JSON.stringify([id, next_page, comments, errors_count])}`)
 				resolve();
 				return;
 			}
@@ -130,14 +128,28 @@ const getTicketComments = async function(id, next_page = false, comments = [], e
 			if ('ERR_BAD_RESPONSE' === error.code) {
 				console.log('ERR_BAD_RESPONSE received, retring...', id, next_page, comments, errors_count);
 				resolve(getTicketComments(id, next_page, comments, ++errors_count))
+			} else if ('ERR_BAD_REQUEST' === error.code && 404 === error.response.status) {
+				console.log('Looks like ticket was removed, skipping it', id)
+				logError(`Looks like ticket was removed, skipping it ${id}`);
+				resolve();
 			} else {
 				console.log('!!!!Error code:', error.code);
 				console.log(error);
-	
 				reject(); // ::TODO:: if 500 error or something just skipping and continuing
 			}
 		});
 
+	});
+}
+
+
+/**
+ * Logs an error message to a file.
+ * @param {string} message - The error message to log.
+ */
+const logError = (message) => {
+	fs.writeFileSync(exportFolder + 'errors.txt', message + "\n", { flag: "a+" }, (err) => {
+		if (err) throw err;
 	});
 }
 
