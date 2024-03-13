@@ -299,21 +299,32 @@ const downloadAttachments = async function(cursor = false) {
 					for (let attachment of comment.attachments) {
 						console.log(attachment.content_url);
 
+						const fileName = exportFolder + 'attachments/' + attachment.id + path.extname(attachment.file_name);
+						// if file already exists - skipping it
+						if (fs.existsSync(fileName)) {
+							continue;
+						}
+
 						var config = {
 							method: 'GET',
 							url: attachment.content_url,
 							headers: headers,
 							responseType: 'arraybuffer',
 						};
+						try {
+							let response = await axios.get(attachment.content_url, config);
 
-						let response = await axios.get(attachment.content_url, config);
+							//console.log(response.data);
+	
+							fs.writeFileSync(fileName, Buffer.from(response.data), { flag: "w+" }, (err) => {
+								if (err) throw err;
+								//console.log('The file is created');
+							});
+						} catch (e) {
+							console.log('error, skipping attachment id', attachment.id, 'Error', e.code, e.response.status);
+							logError(`Skipping attachment id ${attachment.id} Error: ${e.code} ${e.response.status}`);
+						}
 
-						//console.log(response.data);
-
-						fs.writeFileSync(exportFolder + 'attachments/' + attachment.id + path.extname(attachment.file_name), Buffer.from(response.data), { flag: "w+" }, (err) => {
-							if (err) throw err;
-							//console.log('The file is created');
-						});
 
 /*
 
