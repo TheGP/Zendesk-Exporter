@@ -16,6 +16,14 @@ if (!fs.existsSync(exportFolder)) {
     fs.mkdirSync(exportFolder);
     console.log(`Folder "${exportFolder}" created successfully.`);
 }
+if (!fs.existsSync(exportFolder + 'attachments/')) {
+    fs.mkdirSync(exportFolder + 'attachments/');
+    console.log(`Folder "${exportFolder}attachments" created successfully.`);
+}
+
+
+
+
 
 
 /**
@@ -274,7 +282,6 @@ const getUsers = function(cursor = false) {
  */
 const downloadAttachments = async function(cursor = false) {
 
-	var lineByLine = require('n-readlines');
 	var liner = new lineByLine(exportFolder + 'comments.json');
 
 	var line;
@@ -286,10 +293,10 @@ const downloadAttachments = async function(cursor = false) {
 
 			let comments = JSON.parse(line);
 
-			for (comment of comments) {
+			for (let comment of comments) {
 				if (0 < comment.attachments.length) {
 
-					for (attachment of comment.attachments) {
+					for (let attachment of comment.attachments) {
 						console.log(attachment.content_url);
 
 						var config = {
@@ -303,7 +310,7 @@ const downloadAttachments = async function(cursor = false) {
 
 						//console.log(response.data);
 
-						fs.writeFileSync('./attachments/' + attachment.id + path.extname(attachment.file_name), Buffer.from(response.data), { flag: "w+" }, (err) => {
+						fs.writeFileSync(exportFolder + 'attachments/' + attachment.id + path.extname(attachment.file_name), Buffer.from(response.data), { flag: "w+" }, (err) => {
 							if (err) throw err;
 							//console.log('The file is created');
 						});
