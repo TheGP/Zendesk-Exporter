@@ -77,7 +77,7 @@ const getTickets = async (cursor = false) => {
  * @param {Array} comments - Array to store comments.
  * @returns {Promise<void>} Promise indicating success of operation.
  */
-const getTicketComments = async function(id, next_page = false, comments = []) {
+const getTicketComments = async function(id, next_page = false, comments = [], errors_count = 0) {
 
 	return new Promise((resolve, reject) => {
 
@@ -117,9 +117,19 @@ const getTicketComments = async function(id, next_page = false, comments = []) {
 			resolve();
 
 		}).catch(function (error) {
+			if (10 < errors_count) {
+				console.log('skipping because of too many errors', id)
+				fs.writeFileSync(exportFolder + 'errors.txt', `Skipping getTicketComments because of too many errors: ${JSON.stringify([id, next_page, comments, errors_count])} \n`, { flag: "a+" }, (err) => {
+					if (err) throw err;
+				});
+				resolve();
+				return;
+			}
+
+
 			if ('ERR_BAD_RESPONSE' === error.code) {
-				console.log('ERR_BAD_RESPONSE received, retring...');
-				resolve(getTicketComments(id, next_page, comments))
+				console.log('ERR_BAD_RESPONSE received, retring...', id, next_page, comments, errors_count);
+				resolve(getTicketComments(id, next_page, comments, ++errors_count))
 			} else {
 				console.log('!!!!Error code:', error.code);
 				console.log(error);
