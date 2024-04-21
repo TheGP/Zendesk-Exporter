@@ -13,8 +13,8 @@ const headers = {
 const exportFolder = './exported/';
 
 if (!fs.existsSync(exportFolder)) {
-    fs.mkdirSync(exportFolder);
-    console.log(`Folder "${exportFolder}" created successfully.`);
+	fs.mkdirSync(exportFolder);
+	console.log(`Folder "${exportFolder}" created successfully.`);
 }
 if (!fs.existsSync(exportFolder + 'attachments/')) {
     fs.mkdirSync(exportFolder + 'attachments/');
@@ -22,9 +22,15 @@ if (!fs.existsSync(exportFolder + 'attachments/')) {
 }
 
 
-
-
-
+const requestWithRateLimit = async (config) => {
+	const response = await axios(config);
+	if (response.status === 429) {
+		const secondsToWait = Number(response.headers["retry-after"])
+		await new Promise(resolve => setTimeout(resolve, (secondsToWait + 1) * 1000))
+		return requestWithRateLimit(config)
+	}
+	return response;
+}
 
 /**
  * Retrieves tickets
@@ -46,7 +52,7 @@ const getTickets = async (cursor = false) => {
 
 	return new Promise((resolve, reject) => {
 
-		axios(config).then(function (response) {
+		requestWithRateLimit(config).then(function (response) {
 
 			//console.log(JSON.stringify(response.data.tickets));
 			for (const [key, value] of Object.entries(response.data.tickets)) {
@@ -102,7 +108,7 @@ const getTicketComments = async function(id, next_page = false, comments = [], e
 		    },
 		};
 
-		axios(config).then(async function (response) {
+		requestWithRateLimit(config).then(async function (response) {
 
 			comments = [...comments, ...response.data.comments];
 
@@ -241,7 +247,7 @@ const getUsers = function(cursor = false) {
 
 	return new Promise((resolve, reject) => {
 
-		axios(config).then(function (response) {
+		requestWithRateLimit(config).then(function (response) {
 
 			//console.log(JSON.stringify(response.data.tickets));
 			for (const [key, value] of Object.entries(response.data.users)) {
@@ -328,7 +334,7 @@ const downloadAttachments = async function(cursor = false) {
 
 /*
 
-						await axios(config).then(function (response) {
+						await requestWithRateLimit(config).then(function (response) {
 
 console.log('writing file');
 							fs.writeFileSync(attachment.id, response.data + "\n", { flag: "a+" }, (err) => {
@@ -376,7 +382,7 @@ const getViews = async function(next_page = false, items = []) {
 		    },
 		};
 
-		axios(config).then(async function (response) {
+		requestWithRateLimit.axios(config).then(async function (response) {
 
 			items = [...items, ...response.data.views];
 
@@ -429,7 +435,7 @@ const getTriggers = async function(next_page = false, items = []) {
 		    },
 		};
 
-		axios(config).then(async function (response) {
+		requestWithRateLimit(config).then(async function (response) {
 
 			items = [...items, ...response.data.triggers];
 
@@ -482,7 +488,7 @@ const getMacros = async function(next_page = false, items = []) {
 		    },
 		};
 
-		axios(config).then(async function (response) {
+		requestWithRateLimit(config).then(async function (response) {
 
 			items = [...items, ...response.data.macros];
 
@@ -535,7 +541,7 @@ const getAutomations = async function(next_page = false, items = []) {
 		    },
 		};
 
-		axios(config).then(async function (response) {
+		requestWithRateLimit(config).then(async function (response) {
 
 			items = [...items, ...response.data.automations];
 
@@ -579,7 +585,7 @@ const getSettings = function(cursor = false) {
 		url: process.env.ZENDESK_API + 'account/settings.json',
 		headers: headers,
 	};
-	axios(config).then(function (response) {
+	requestWithRateLimit(config).then(function (response) {
 
 		//console.log(JSON.stringify(response.data.tickets));
 
@@ -607,7 +613,7 @@ const getSupportAddresses = async function(next_page = false, items = []) {
 		    },
 		};
 
-		axios(config).then(async function (response) {
+		requestWithRateLimit(config).then(async function (response) {
 
 			items = [...items, ...response.data.recipient_addresses];
 
