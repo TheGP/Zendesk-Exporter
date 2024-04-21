@@ -13,8 +13,8 @@ const headers = {
 const exportFolder = './exported/';
 
 if (!fs.existsSync(exportFolder)) {
-    fs.mkdirSync(exportFolder);
-    console.log(`Folder "${exportFolder}" created successfully.`);
+	fs.mkdirSync(exportFolder);
+	console.log(`Folder "${exportFolder}" created successfully.`);
 }
 if (!fs.existsSync(exportFolder + 'attachments/')) {
     fs.mkdirSync(exportFolder + 'attachments/');
@@ -23,13 +23,13 @@ if (!fs.existsSync(exportFolder + 'attachments/')) {
 
 
 const requestWithRateLimit = async (config) => {
-  const response = await axios(config);
-  if (response.status === 429) {
-    const secondsToWait = Number(response.headers["retry-after"])
-    await new Promise(resolve => setTimeout(resolve, (secondsToWait + 1) * 1000))
-    return requestWithRateLimit(config)
-  }
-  return response;
+	const response = await axios(config);
+	if (response.status === 429) {
+		const secondsToWait = Number(response.headers["retry-after"])
+		await new Promise(resolve => setTimeout(resolve, (secondsToWait + 1) * 1000))
+		return requestWithRateLimit(config)
+	}
+	return response;
 }
 
 /**
