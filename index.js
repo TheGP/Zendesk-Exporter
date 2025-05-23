@@ -23,6 +23,7 @@ if (!fs.existsSync(exportFolder + 'attachments/')) {
 
 
 const requestWithRateLimit = async (config) => {
+	config.validateStatus = status => status === 200 || status === 429
 	const response = await axios(config);
 	if (response.status === 429) {
 		const secondsToWait = Number(response.headers["retry-after"])
