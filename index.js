@@ -383,7 +383,7 @@ const getViews = async function(next_page = false, items = []) {
 		    },
 		};
 
-		requestWithRateLimit.axios(config).then(async function (response) {
+		requestWithRateLimit(config).then(async function (response) {
 
 			items = [...items, ...response.data.views];
 
